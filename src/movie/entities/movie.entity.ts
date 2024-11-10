@@ -1,8 +1,11 @@
 import { Director } from 'src/director/entities/director.entity';
+import { Genre } from 'src/genre/entities/genre.entity';
 import {
   Column,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -20,8 +23,9 @@ export class Movie extends BaseTable {
   })
   title: string;
 
-  @Column()
-  genre: string;
+  @ManyToMany(() => Genre, (genre) => genre.movies)
+  @JoinTable()
+  genres: Genre[];
 
   @OneToOne(() => MovieDetail, (movieDetail) => movieDetail.movie, {
     cascade: true,
