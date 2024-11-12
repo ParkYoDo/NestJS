@@ -1,17 +1,21 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CreateGenreDto } from './dto/create-genre.dto';
 import { UpdateGenreDto } from './dto/update-genre.dto';
 import { GenreService } from './genre.service';
 
 @Controller('genre')
+@UseInterceptors(ClassSerializerInterceptor) // class-validator 사용
 export class GenreController {
   constructor(private readonly genreService: GenreService) {}
 
@@ -21,7 +25,7 @@ export class GenreController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseIntPipe) id: string) {
     return this.genreService.findOne(+id);
   }
 
@@ -31,12 +35,15 @@ export class GenreController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateGenreDto: UpdateGenreDto) {
+  update(
+    @Param('id', ParseIntPipe) id: string,
+    @Body() updateGenreDto: UpdateGenreDto,
+  ) {
     return this.genreService.update(+id, updateGenreDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseIntPipe) id: string) {
     return this.genreService.remove(+id);
   }
 }

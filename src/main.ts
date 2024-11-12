@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  // class-validator 사용하기위해 global pipe 사용
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true, // dto에 정의된 타입만 사용한다 (데이터 핸들링)
