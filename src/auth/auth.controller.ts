@@ -8,6 +8,11 @@ export class AuthController {
   @Post('register')
   // authorization : Basic $token
   registerUser(@Headers('authorization') token: string) {
-    this.authService.register(token);
+    return this.authService.register(token);
+  }
+
+  @Post('login')
+  loginUser(@Headers('authorization') token: string) {
+    return this.authService.login(token);
   }
 }
