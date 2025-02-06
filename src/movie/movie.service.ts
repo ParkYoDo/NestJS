@@ -49,7 +49,8 @@ export class MovieService {
       .leftJoinAndSelect('movie.genres', 'genres');
 
     if (title) qb.where('movie.title LIKE :title', { title: `%${title}%` });
-    this.commonService.applyPagePaginationParamsToQb(qb, dto);
+    // this.commonService.applyPagePaginationParamsToQb(qb, dto);
+    this.commonService.applyCursorPaginationParamsToQb(qb, dto);
 
     return await qb.getManyAndCount();
   }
