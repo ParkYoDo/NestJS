@@ -1,9 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CommonService } from 'src/common/common.service';
 import { Director } from 'src/director/entities/director.entity';
 import { Genre } from 'src/genre/entities/genre.entity';
 import { DataSource, In, Repository } from 'typeorm';
 import { CreateMovieDto } from './dto/create-movie.dto';
+import { GetMovieDto } from './dto/get-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { MovieDetail } from './entities/movie-detail.entity';
 import { Movie } from './entities/movie.entity';
@@ -20,9 +22,12 @@ export class MovieService {
     @InjectRepository(Genre)
     private readonly genreRepository: Repository<Genre>,
     private readonly dataSource: DataSource,
+    private readonly commonService: CommonService,
   ) {}
 
-  async findAll(title?: string) {
+  async findAll(dto: GetMovieDto) {
+    const { title } = dto;
+
     // if (!title)
     //   return [
     //     await this.movieRepository.find({
@@ -44,6 +49,7 @@ export class MovieService {
       .leftJoinAndSelect('movie.genres', 'genres');
 
     if (title) qb.where('movie.title LIKE :title', { title: `%${title}%` });
+    this.commonService.applyPagePaginationParamsToQb(qb, dto);
 
     return await qb.getManyAndCount();
   }
