@@ -50,9 +50,15 @@ export class MovieService {
 
     if (title) qb.where('movie.title LIKE :title', { title: `%${title}%` });
     // this.commonService.applyPagePaginationParamsToQb(qb, dto);
-    this.commonService.applyCursorPaginationParamsToQb(qb, dto);
+    const { nextCursor } =
+      await this.commonService.applyCursorPaginationParamsToQb(qb, dto);
+    const [data, count] = await qb.getManyAndCount();
 
-    return await qb.getManyAndCount();
+    return {
+      data,
+      nextCursor,
+      count,
+    };
   }
 
   async findOne(id: number) {
