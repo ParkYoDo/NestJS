@@ -14,7 +14,7 @@ import {
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Public } from 'src/auth/decorator/public.decorator';
 import { RBAC } from 'src/auth/decorator/rbac.decorator';
 import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
@@ -60,11 +60,17 @@ export class MovieController {
   @Post()
   @RBAC(Role.admin)
   @UseInterceptors(TransactionInterceptor)
-  @UseInterceptors(FilesInterceptor('movies'))
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'movie', maxCount: 1 },
+      { name: 'posterㄴ', maxCount: 2 },
+    ]),
+  )
   postMovie(
     @Body() body: CreateMovieDto,
     @Req() req,
-    @UploadedFiles() files: Express.Multer.File[],
+    @UploadedFiles()
+    files: { movie?: Express.Multer.File[]; poster?: Express.Multer.File[] },
   ) {
     console.log(files);
     return this.movieService.create(body, req.queryRunner);
