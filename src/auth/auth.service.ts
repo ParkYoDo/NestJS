@@ -25,7 +25,7 @@ export class AuthService {
     // ['Basic', $token]
     const basicSplit = rawToken?.split(' ');
 
-    if (basicSplit.length !== 2)
+    if (basicSplit?.length !== 2)
       throw new BadRequestException('토큰 포맷이 잘못됐습니다!');
 
     const [basic, token] = basicSplit;
