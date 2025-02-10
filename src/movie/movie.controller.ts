@@ -11,8 +11,10 @@ import {
   Post,
   Query,
   Req,
+  UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Public } from 'src/auth/decorator/public.decorator';
 import { RBAC } from 'src/auth/decorator/rbac.decorator';
 import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
@@ -27,14 +29,14 @@ import { MovieService } from './movie.service';
 export class MovieController {
   constructor(private readonly movieService: MovieService) {}
 
-  @Public()
   @Get()
+  @Public()
   getMovies(@Query() dto: GetMovieDto) {
     return this.movieService.findAll(dto);
   }
 
-  @Public()
   @Get(':id')
+  @Public()
   getMovie(
     @Param(
       'id',
@@ -55,15 +57,21 @@ export class MovieController {
     return this.movieService.findOne(id);
   }
 
+  @Post()
   @RBAC(Role.admin)
   @UseInterceptors(TransactionInterceptor)
-  @Post()
-  postMovie(@Body() body: CreateMovieDto, @Req() req) {
+  @UseInterceptors(FileInterceptor('movie'))
+  postMovie(
+    @Body() body: CreateMovieDto,
+    @Req() req,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    console.log(file);
     return this.movieService.create(body, req.queryRunner);
   }
 
-  @RBAC(Role.admin)
   @Patch(':id')
+  @RBAC(Role.admin)
   patchMovie(
     @Param('id', ParseIntPipe) id: string,
     @Body() body: UpdateMovieDto,
@@ -71,8 +79,8 @@ export class MovieController {
     return this.movieService.update(+id, body);
   }
 
-  @RBAC(Role.admin)
   @Delete(':id')
+  @RBAC(Role.admin)
   deleteMovie(@Param('id', ParseIntPipe) id: string) {
     return this.movieService.remove(+id);
   }
