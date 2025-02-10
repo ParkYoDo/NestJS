@@ -11,10 +11,10 @@ import {
   Post,
   Query,
   Req,
-  UploadedFiles,
+  UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Public } from 'src/auth/decorator/public.decorator';
 import { RBAC } from 'src/auth/decorator/rbac.decorator';
 import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
@@ -61,36 +61,29 @@ export class MovieController {
   @RBAC(Role.admin)
   @UseInterceptors(TransactionInterceptor)
   @UseInterceptors(
-    FileFieldsInterceptor(
-      [
-        { name: 'movie', maxCount: 1 },
-        { name: 'posterㄴ', maxCount: 2 },
-      ],
-      {
-        limits: {
-          fileSize: 20 * 1024 * 1024, // 20 MB
-        },
-        fileFilter(req, file, callback) {
-          console.log(file);
-          if (file.mimetype !== 'video/mp4')
-            return callback(
-              new BadRequestException('MP4 타입만 업로드가 가능합니다!'),
-              false,
-            );
-
-          return callback(null, true);
-        },
+    FileInterceptor('movie', {
+      limits: {
+        fileSize: 20 * 1024 * 1024, // 20 MB
       },
-    ),
+      fileFilter(req, file, callback) {
+        console.log(file);
+        if (file.mimetype !== 'video/mp4')
+          return callback(
+            new BadRequestException('MP4 타입만 업로드가 가능합니다!'),
+            false,
+          );
+
+        return callback(null, true);
+      },
+    }),
   )
   postMovie(
     @Body() body: CreateMovieDto,
     @Req() req,
-    @UploadedFiles()
-    files: { movie?: Express.Multer.File[]; poster?: Express.Multer.File[] },
+    @UploadedFile()
+    movie: Express.Multer.File,
   ) {
-    console.log(files);
-    return this.movieService.create(body, req.queryRunner);
+    return this.movieService.create(body, movie.filename, req.queryRunner);
   }
 
   @Patch(':id')
