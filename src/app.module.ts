@@ -14,6 +14,7 @@ import { RBACGuard } from './auth/guard/rbac.guard';
 import { BearerTokenMiddleware } from './auth/middleware/bearer-token.middleware';
 import { envVariablesKeys } from './common/const/env.const';
 import { ForbiddenExceptionFilter } from './common/filter/forbidden.filter';
+import { QueryFailedExceptionFilter } from './common/filter/query-failed.filter';
 import { ResponseTimeInterceptor } from './common/interceptor/respoense-time.interceptor';
 import { DirectorModule } from './director/director.module';
 import { Director } from './director/entities/director.entity';
@@ -68,6 +69,7 @@ import { UserModule } from './user/user.module';
     { provide: APP_GUARD, useClass: RBACGuard },
     { provide: APP_INTERCEPTOR, useClass: ResponseTimeInterceptor },
     { provide: APP_FILTER, useClass: ForbiddenExceptionFilter },
+    { provide: APP_FILTER, useClass: QueryFailedExceptionFilter },
   ],
 })
 export class AppModule implements NestModule {
