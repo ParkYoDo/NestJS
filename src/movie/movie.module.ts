@@ -1,3 +1,4 @@
+import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommonModule } from 'src/common/common.module';
@@ -21,6 +22,7 @@ import { MovieService } from './movie.service';
       MovieUserLike,
     ]),
     CommonModule,
+    CacheModule.register({ ttl: 3000 }),
   ],
   controllers: [MovieController],
   providers: [MovieService],
