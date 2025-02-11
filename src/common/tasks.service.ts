@@ -5,14 +5,28 @@ import { readdir, unlink } from 'fs/promises';
 import { join, parse } from 'path';
 import { Movie } from 'src/movie/entities/movie.entity';
 import { Repository } from 'typeorm';
+import { DefaultLogger } from './logger/default.logger';
 
 @Injectable()
 export class TasksService {
+  // private readonly logger = new Logger(TasksService.name);
+
   constructor(
     @InjectRepository(Movie)
     private readonly movieRepository: Repository<Movie>,
     private readonly schedulerRegistry: SchedulerRegistry,
+    private readonly logger: DefaultLogger,
   ) {}
+
+  // @Cron('*/5 * * * * *')
+  // loggerTest() {
+  //   this.logger.fatal('1초마다 실행!'); // 치명적 오류
+  //   this.logger.error('1초마다 실행!'); // 오류
+  //   this.logger.warn('1초마다 실행!'); // 경고
+  //   this.logger.log('1초마다 실행!'); // 정보성 로그
+  //   this.logger.debug('1초마다 실행!'); // 개발환경 중요 로그
+  //   this.logger.verbose('1초마다 실행!'); // 중요X, 궁금해서
+  // }
 
   @Cron('0 0 0 * * *')
   async eraseOrphanFiles() {
