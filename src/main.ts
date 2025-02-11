@@ -12,10 +12,19 @@ async function bootstrap() {
   );
   // class-validator 사용하기위해 global pipe 사용
   // app.setGlobalPrefix('v1');
-  app.enableVersioning({
-    type: VersioningType.URI,
-    // defaultVersion: ['1', '2'],
-  });
+  // app.enableVersioning({
+  // URL
+  // type: VersioningType.URI,
+  // defaultVersion: ['1', '2'],
+
+  // HEADER
+  // type: VersioningType.HEADER,
+  // header: 'version',
+
+  // MEDIA TYPE
+  // type: VersioningType.MEDIA_TYPE,
+  // key: 'v=',
+  // });
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
   app.useGlobalPipes(
     new ValidationPipe({
