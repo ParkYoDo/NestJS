@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { Cron, SchedulerRegistry } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { readdir, unlink } from 'fs/promises';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { join, parse } from 'path';
 import { Movie } from 'src/movie/entities/movie.entity';
 import { Repository } from 'typeorm';
-import { DefaultLogger } from './logger/default.logger';
 
 @Injectable()
 export class TasksService {
@@ -15,17 +15,19 @@ export class TasksService {
     @InjectRepository(Movie)
     private readonly movieRepository: Repository<Movie>,
     private readonly schedulerRegistry: SchedulerRegistry,
-    private readonly logger: DefaultLogger,
+    // private readonly logger: DefaultLogger,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER)
+    private readonly logger: LoggerService,
   ) {}
 
   // @Cron('*/5 * * * * *')
   // loggerTest() {
-  //   this.logger.fatal('1초마다 실행!'); // 치명적 오류
-  //   this.logger.error('1초마다 실행!'); // 오류
-  //   this.logger.warn('1초마다 실행!'); // 경고
-  //   this.logger.log('1초마다 실행!'); // 정보성 로그
-  //   this.logger.debug('1초마다 실행!'); // 개발환경 중요 로그
-  //   this.logger.verbose('1초마다 실행!'); // 중요X, 궁금해서
+  //   this.logger.fatal('1초마다 실행!', null, TasksService.name); // 치명적 오류
+  //   this.logger.error('1초마다 실행!', null, TasksService.name); // 오류
+  //   this.logger.warn('1초마다 실행!', TasksService.name); // 경고
+  //   this.logger.log('1초마다 실행!', TasksService.name); // 정보성 로그
+  //   this.logger.debug('1초마다 실행!', TasksService.name); // 개발환경 중요 로그
+  //   this.logger.verbose('1초마다 실행!', TasksService.name); // 중요X, 궁금해서
   // }
 
   @Cron('0 0 0 * * *')
