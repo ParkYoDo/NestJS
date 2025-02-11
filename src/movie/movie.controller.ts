@@ -12,6 +12,7 @@ import {
   Post,
   Query,
   UseInterceptors,
+  Version,
 } from '@nestjs/common';
 import { Public } from 'src/auth/decorator/public.decorator';
 import { RBAC } from 'src/auth/decorator/rbac.decorator';
@@ -26,7 +27,21 @@ import { GetMovieDto } from './dto/get-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { MovieService } from './movie.service';
 
-@Controller('movie')
+@Controller({
+  path: 'movie',
+  version: '2',
+})
+export class MovieV1ControllerV2 {
+  @Get()
+  getMovies() {
+    return [];
+  }
+}
+
+@Controller({
+  path: 'movie',
+  version: ['1', '3'],
+})
 @UseInterceptors(ClassSerializerInterceptor) // class-validator 사용
 export class MovieController {
   constructor(private readonly movieService: MovieService) {}
@@ -34,6 +49,7 @@ export class MovieController {
   @Get()
   @Public()
   @Throttle({ count: 5, unit: 'minute' })
+  @Version('5')
   getMovies(@Query() dto: GetMovieDto, @UserId() userId?: number) {
     return this.movieService.findAll(dto, userId);
   }

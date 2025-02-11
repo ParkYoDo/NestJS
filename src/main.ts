@@ -1,4 +1,4 @@
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { AppModule } from './app.module';
@@ -11,6 +11,11 @@ async function bootstrap() {
     // }
   );
   // class-validator 사용하기위해 global pipe 사용
+  // app.setGlobalPrefix('v1');
+  app.enableVersioning({
+    type: VersioningType.URI,
+    // defaultVersion: ['1', '2'],
+  });
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
   app.useGlobalPipes(
     new ValidationPipe({
