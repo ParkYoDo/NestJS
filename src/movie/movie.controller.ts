@@ -1,3 +1,4 @@
+import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
 import {
   BadRequestException,
   Body,
@@ -33,6 +34,14 @@ export class MovieController {
   @Public()
   getMovies(@Query() dto: GetMovieDto, @UserId() userId?: number) {
     return this.movieService.findAll(dto, userId);
+  }
+
+  @Get('recent')
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('getMoviesRecent')
+  @CacheTTL(10 * 1000)
+  getMoviesRecent() {
+    return this.movieService.findRecent();
   }
 
   @Get(':id')
