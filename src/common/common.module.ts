@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
 import { MulterModule } from '@nestjs/platform-express';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { diskStorage } from 'multer';
 import { join } from 'path';
+import { Movie } from 'src/movie/entities/movie.entity';
 import { CommonController } from './common.controller';
 import { CommonService } from './common.service';
 import { TasksService } from './tasks.service';
@@ -24,6 +26,7 @@ import { TasksService } from './tasks.service';
         },
       }),
     }),
+    TypeOrmModule.forFeature([Movie]),
   ],
   controllers: [CommonController],
   providers: [CommonService, TasksService],
