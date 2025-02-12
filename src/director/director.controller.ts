@@ -10,11 +10,13 @@ import {
   Post,
   UseInterceptors,
 } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { DirectorService } from './director.service';
 import { CreateDirectorDto } from './dto/create-director.dto';
 import { UpdateDirectorDto } from './dto/update-director.dto';
 
 @Controller('director')
+@ApiBearerAuth()
 @UseInterceptors(ClassSerializerInterceptor) // class-validator 사용
 export class DirectorController {
   constructor(private readonly directorService: DirectorService) {}

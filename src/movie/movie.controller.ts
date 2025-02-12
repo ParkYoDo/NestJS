@@ -12,9 +12,8 @@ import {
   Post,
   Query,
   UseInterceptors,
-  Version,
-  VERSION_NEUTRAL,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Public } from 'src/auth/decorator/public.decorator';
 import { RBAC } from 'src/auth/decorator/rbac.decorator';
 import { QueryRunner } from 'src/common/decorator/query-runner.decorator';
@@ -44,6 +43,7 @@ import { MovieService } from './movie.service';
   // version: '1',
   // version: VERSION_NEUTRAL,
 })
+@ApiBearerAuth()
 @UseInterceptors(ClassSerializerInterceptor) // class-validator 사용
 export class MovieController {
   constructor(private readonly movieService: MovieService) {}
@@ -52,6 +52,13 @@ export class MovieController {
   @Public()
   @Throttle({ count: 5, unit: 'minute' })
   // @Version('5')
+  @ApiOperation({
+    description: '[Movie]를 Pagination하는 API',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '성공적으로 api 요청 했을때',
+  })
   getMovies(@Query() dto: GetMovieDto, @UserId() userId?: number) {
     return this.movieService.findAll(dto, userId);
   }
