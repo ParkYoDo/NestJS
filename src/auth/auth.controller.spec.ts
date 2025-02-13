@@ -97,8 +97,8 @@ describe('AuthController', () => {
 
       jest
         .spyOn(authService, 'issueToken')
-        .mockResolvedValue(accessToken)
-        .mockResolvedValue(refreshToken);
+        .mockResolvedValueOnce(refreshToken)
+        .mockResolvedValueOnce(accessToken);
 
       const result = await authController.loginUserPassport(req);
 
