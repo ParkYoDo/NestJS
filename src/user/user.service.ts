@@ -1,23 +1,42 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
+import { envVariablesKeys } from 'src/common/const/env.const';
+import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
-
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly configService: ConfigService,
   ) {}
 
-  create(createUserDto: CreateUserDto) {
-    return this.userRepository.save(createUserDto);
+  async create(createUserDto: CreateUserDto) {
+    const { email, password } = createUserDto;
+
+    const user = await this.userRepository.findOne({ where: { email } });
+
+    if (user) throw new BadRequestException('이미 가입된 이메일입니다!');
+
+    const hash = await bcrypt.hash(
+      password,
+      this.configService.get<number>(envVariablesKeys.hashRounds),
+    );
+
+    await this.userRepository.save({ email, password: hash });
+    return await this.userRepository.findOne({ where: { email } });
   }
 
-  findAll() {
-    return this.userRepository.find();
+  async findAll() {
+    return await this.userRepository.find();
   }
 
   async findOne(id: number) {
@@ -28,13 +47,23 @@ export class UserService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
+    const { password } = updateUserDto;
+
     const user = await this.userRepository.findOne({ where: { id } });
 
     if (!user) throw new NotFoundException('존재하지 않는 사용자입니다!');
 
-    await this.userRepository.update({ id }, updateUserDto);
+    const hash = await bcrypt.hash(
+      password,
+      this.configService.get<number>(envVariablesKeys.hashRounds),
+    );
 
-    return this.userRepository.findOne({ where: { id } });
+    await this.userRepository.update(
+      { id },
+      { ...updateUserDto, password: hash },
+    );
+
+    return await this.userRepository.findOne({ where: { id } });
   }
 
   async remove(id: number) {
