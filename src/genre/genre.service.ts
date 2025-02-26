@@ -17,7 +17,15 @@ export class GenreService {
   }
 
   async findOne(id: number) {
-    return await this.genreRepository.findOne({ where: { id } });
+    const genre = await this.genreRepository.findOne({
+      where: {
+        id,
+      },
+    });
+
+    if (!genre) throw new NotFoundException('존재하지 않는 ID 장르입니다!');
+
+    return genre;
   }
 
   async create(createGenreDto: CreateGenreDto) {
